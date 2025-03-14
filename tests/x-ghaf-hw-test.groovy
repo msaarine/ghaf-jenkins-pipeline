@@ -104,7 +104,7 @@ def ghaf_robot_test(String test_tags) {
     }
   }
   dir("Robot-Framework/test-suites") {
-    sh 'rm -f *.png output.xml report.html log.html'
+    sh 'rm -f *.png *.txt output.xml report.html log.html'
     // On failure, continue the pipeline execution
     env.COMMIT_HASH = (params.IMG_URL =~ /commit_([a-f0-9]{40})/)[0][1]
     try {
@@ -283,13 +283,18 @@ pipeline {
       }
       script {
         if (env.BOOT_PASSED != null) {
+           archive = "Robot-Framework/test-suites/**/*.html"
+          archive = "${archive}, Robot-Framework/test-suites/**/*.xml"
+          archive = "${archive}, Robot-Framework/test-suites/**/*.png"
+          archive = "${archive}, Robot-Framework/test-suites/**/*.txt"
+          archiveArtifacts allowEmptyArchive: true, artifacts: archive
           // Publish all results under Robot-Framework/test-suites/$test_tags subfolders
           step(
             [$class: 'RobotPublisher',
               archiveDirName: 'robot-plugin',
               outputPath: 'Robot-Framework/test-suites/$test_tags',
               outputFileName: '**/output.xml',
-              otherFiles: '**/*.png',
+              otherFiles: '**/*.png,**/*.txt',
               disableArchiveOutput: false,
               reportFileName: '**/report.html',
               logFileName: '**/log.html',
