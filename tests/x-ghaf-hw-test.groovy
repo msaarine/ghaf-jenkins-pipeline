@@ -104,7 +104,7 @@ def ghaf_robot_test(String test_tags) {
     }
   }
   dir("Robot-Framework/test-suites") {
-    sh 'rm -f *.png output.xml report.html log.html'
+    sh 'rm -f *.txt *.png output.xml report.html log.html'
     // On failure, continue the pipeline execution
     env.COMMIT_HASH = (params.IMG_URL =~ /commit_([a-f0-9]{40})/)[0][1]
     try {
@@ -129,7 +129,7 @@ def ghaf_robot_test(String test_tags) {
       // Move the test output (if any) to a subdirectory
       sh """
         rm -fr $test_tags; mkdir -p $test_tags
-        mv -f *.png output.xml report.html log.html $test_tags/ || true
+        mv -f *.txt *.png output.xml report.html log.html $test_tags/ || true
       """
     }
   }
@@ -290,6 +290,7 @@ pipeline {
               outputPath: 'Robot-Framework/test-suites/$test_tags',
               outputFileName: '**/output.xml',
               otherFiles: '**/*.png',
+              otherFiles: '**/*.txt',
               disableArchiveOutput: false,
               reportFileName: '**/report.html',
               logFileName: '**/log.html',
