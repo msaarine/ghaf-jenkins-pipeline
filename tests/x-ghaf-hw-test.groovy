@@ -13,9 +13,12 @@ def CONF_FILE_PATH = '/etc/jenkins/test_config.json'
 properties([
   parameters([
     string(name: 'REPO_URL', defaultValue: 'https://github.com/tiiuae/ci-test-automation.git', description: 'Select ci-test-automation repository. Allow testing also with a forked repository'),
-    string(name: 'IMG_URL', defaultValue: 'https://ghaf-jenkins-controller-dev.northeurope.cloudapp.azure.com//artifacts/ghaf-main-pipeline/build_35-commit_a36a9236116d3516b952d68ccd7c0b4887c5e2b2/x86_64-linux.microchip-icicle-kit-debug-from-x86_64/nixos.img', description: 'Target image url. Need to be given! Other wise agent for execution is not set.'),
-    string(name: 'BRANCH', defaultValue: 'main', description: 'ci-test-automation branch to checkout'),
-    string(name: 'TEST_TAGS', defaultValue: '', description: 'Target test tags device need to match with given image URL!(combination of device and tag(s) or just a tag e.g.: bootANDorin-nx, SP-T65, SP-T45ORSP-T60 etc..)'),
+    string(name: 'IMG_URL', defaultValue: 'https://ghaf-jenkins-controller-prod.northeurope.cloudapp.azure.com/artifacts/ghaf-main-pipeline/build_912-commit_4a6dcda0e6ec1994dd82d6a00f76e899a81f9724/x86_64-linux.nvidia-jetson-orin-nx-debug-from-x86_64/sd-image/nixos-image-sd-card-25.05.20250406.063dece-aarch64-linux.img.zst', description: 'Target image url. Need to be given! Other wise agent for execution is not set.'),
+    string(name: 'BRANCH', defaultValue: 'main_orinnx_network_plain', description: 'ci-test-automation branch to checkout'),
+    //string(name: 'TEST_TAGS', defaultValue: '', description: 'Target test tags device need to match with given image URL!(combination of device and tag(s) or just a tag e.g.: -i bootANDorin-nx, SP-T65, SP-T45ORSP-T60 etc..)'),
+    //string(name: 'JENKINS_REPO_URL', defaultValue: 'https://github.com/msaarine/ghaf-jenkins-pipeline.git', description: 'Jenkins repo to use'),
+    //string(name: 'JENKINS_BRANCH', defaultValue: 'main', description: 'Jenkins repo branch to use'),
+    //string(name: 'JENKINS_SCRIPT', defaultValue: 'tests/x-ghaf-hw-test.groovy', description: 'Jenkins groovy script to use'),
     booleanParam(name: 'REFRESH', defaultValue: false, description: 'Read the Jenkins pipeline file and exit, setting the build status to failure.'),
     booleanParam(name: 'FLASH_AND_BOOT', defaultValue: true, description: 'If this is set then image will be downloaded and drive flashed.'),
     booleanParam(name: 'USE_RELAY', defaultValue: true, description: 'If this is set then relay board will be used to cut power from target device when FLASH_AND_BOOT is enabled')
