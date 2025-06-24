@@ -130,7 +130,7 @@ def ghaf_robot_test(String test_tags) {
     }
   }
   dir("Robot-Framework/test-suites") {
-    sh 'rm -f *.txt *.png output.xml report.html log.html'
+    sh 'rm -f *. avi *.txt *.png output.xml report.html log.html'
     // On failure, continue the pipeline execution
     if (params.IMG_URL && params.IMG_URL != '') {
       env.COMMIT_HASH = (params.IMG_URL =~ /commit_([a-f0-9]{40})/)[0][1]
@@ -161,7 +161,7 @@ def ghaf_robot_test(String test_tags) {
       // Move the test output (if any) to a subdirectory
       sh """
         rm -fr $test_tags; mkdir -p $test_tags
-        mv -f *.txt *.png output.xml report.html log.html $test_tags/ || true
+        mv -f *.avi *.txt *.png output.xml report.html log.html $test_tags/ || true
       """
     }
   }
@@ -325,6 +325,29 @@ pipeline {
       }
       script {
         if (env.BOOT_PASSED != null) {
+           // Archive Robot-Framework results as artifacts
+          archive = "Robot-Framework/test-suites/**/*.html, Robot-Framework/test-suites/**/*.xml, Robot-Framework/test-suites/**/*.png, Robot-Framework/test-suites/**/*.txt, Robot-Framework/test-suites/**/*.avi"
+          archiveArtifacts allowEmptyArchive: true, artifacts: archive
+          // Publish all results under Robot-Framework/test-suites subfolders
+          step(
+            [$class: 'RobotPublisher',
+              archiveDirName: 'robot-plugin',
+              outputPath: 'Robot-Framework/test-suites',
+              outputFileName: '**/output.xml',
+              otherFiles: '**/*.png',
+              otherFiles: '**/*.txt',
+              otherFiles: '**/*.avi',
+              disableArchiveOutput: false,
+              reportFileName: '**/report.html',
+              logFileName: '**/log.html',
+              passThreshold: 0,
+              unstableThreshold: 0,
+              onlyCritical: true,
+            ]
+          )
+      }
+      script {
+        if (env.BOOT_PASSED != null) {
           // Archive Robot-Framework results as artifacts
           def result_dir = null
           if (params.TEST_TAGS) {
@@ -342,25 +365,6 @@ pipeline {
               result_dir = 'boot'
             }
           }
-
-          def archive = "Robot-Framework/test-suites/${result_dir}/**/*.html, Robot-Framework/test-suites/${result_dir}/**/*.xml, Robot-Framework/test-suites/${result_dir}/**/*.png, Robot-Framework/test-suites/${result_dir}/**/*.txt"
-          archiveArtifacts allowEmptyArchive: true, artifacts: archive
-          // Publish all results under Robot-Framework/test-suites/$result_dir/ subfolders
-          step(
-            [$class: 'RobotPublisher',
-              archiveDirName: 'robot-plugin',
-              outputPath: "Robot-Framework/test-suites/${result_dir}",
-              outputFileName: '**/**/output.xml',
-              otherFiles: '**/**/*.png',
-              otherFiles: '**/**/*.txt',
-              disableArchiveOutput: false,
-              reportFileName: '**/**/report.html',
-              logFileName: '**/**/log.html',
-              passThreshold: 0,
-              unstableThreshold: 0,
-              onlyCritical: true,
-            ]
-          )
         }
       }
     }
